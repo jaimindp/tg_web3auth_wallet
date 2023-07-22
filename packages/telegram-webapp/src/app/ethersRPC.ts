@@ -10,6 +10,12 @@ export default class EthereumRpc {
         this.provider = provider;
     }
 
+    addressToBytes32(address: string): string {
+        return ethers.utils
+            .hexZeroPad(ethers.utils.hexStripZeros(address), 32)
+            .toLowerCase();
+    }
+
     async getChainId(): Promise<any> {
         try {
             const ethersProvider = new ethers.providers.Web3Provider(this.provider);
@@ -47,6 +53,23 @@ export default class EthereumRpc {
         }
     }
 
+    async getTokenBalance(tokenAddress: string): Promise<string> {
+        try {
+            const ethersProvider = new ethers.providers.Web3Provider(this.provider);
+            const signer = ethersProvider.getSigner();
+
+            const contractInterface = new ethers.utils.Interface(['function balanceOf(address owner) view returns (uint256)', 'function decimals() view returns (uint8)']);
+            const contract = new ethers.Contract(tokenAddress, contractInterface, signer);
+
+            const decimals = await contract.decimals()
+            const balance = await contract.balanceOf(signer.getAddress())
+
+            return ethers.utils.formatUnits(balance, decimals);
+        } catch (error) {
+            return error as string;
+        }
+    }
+
     async getBalance(): Promise<string> {
         try {
             const ethersProvider = new ethers.providers.Web3Provider(this.provider);
@@ -61,6 +84,62 @@ export default class EthereumRpc {
             );
 
             return balance;
+        } catch (error) {
+            return error as string;
+        }
+    }
+
+    async approveLidoToCollateral(): Promise<any> {
+        try {
+            const ethersProvider = new ethers.providers.Web3Provider(this.provider);
+            const signer = ethersProvider.getSigner();
+
+
+            // Hyperlane collateral token address
+            const collateralAddress = "0x1720683d5B7dF06C385B86Cb2101805bb3423ae1";
+            const lidoAddress = '0x1643E812aE58766192Cf7D2Cf9567dF2C37e9B7F'
+            const contractInterface = new ethers.utils.Interface(['function approve(address _spender, uint256 _value)']);
+
+            const contract = new ethers.Contract(lidoAddress, contractInterface, signer);
+
+            // Convert 1 ether to wei
+            const amount = ethers.utils.parseEther("0.001");
+
+            const tx = await contract.approve(collateralAddress, amount)
+            console.log({tx})
+
+            // Wait for transaction to be mined
+            const receipt = await tx.wait();
+
+            return receipt;
+        } catch (error) {
+            return error as string;
+        }
+    }
+
+    async sendLidoToTenet(): Promise<any> {
+        try {
+            const ethersProvider = new ethers.providers.Web3Provider(this.provider);
+            const signer = ethersProvider.getSigner();
+
+
+            // Hyperlane collateral token address
+            const collateralAddress = "0x1720683d5B7dF06C385B86Cb2101805bb3423ae1";
+            const contractInterface = new ethers.utils.Interface(['function transferRemote(uint32 _destination, bytes32 _recipient, uint256 _amount)']);
+
+            const contract = new ethers.Contract(collateralAddress, contractInterface, signer);
+
+            // Convert 1 ether to wei
+            const amount = ethers.utils.parseEther("0.001");
+
+            console.log({address: this.addressToBytes32(await signer.getAddress()), amount: amount.toString()})
+            const tx = await contract.transferRemote(155, this.addressToBytes32(await signer.getAddress()), amount)
+            console.log({tx})
+
+            // Wait for transaction to be mined
+            const receipt = await tx.wait();
+
+            return receipt;
         } catch (error) {
             return error as string;
         }

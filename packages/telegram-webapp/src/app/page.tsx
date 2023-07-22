@@ -12,10 +12,10 @@ const clientId = "BNM3ytXW4KY_TE468iF6Qwqc4EIskvJr6gjmCkj5PCXNgaLRz2XRF6HKhDGCkn
 
 const chainConfig = {
   chainNamespace: CHAIN_NAMESPACES.EIP155,
-  chainId: "0xaa36a7",
-  rpcTarget: "https://eth-sepolia.g.alchemy.com/v2/C4bpWsBCwk4VvaLDGRhkjUvIpHcIhM7T",
+  chainId: "0x5",
+  rpcTarget: "https://eth-goerli.g.alchemy.com/v2/IjVFtqiHIPdAGoFJTTf4NR6ol8yxC-Lh",
   // rpcTarget: "https://eth-goerli.g.alchemy.com/v2/IjVFtqiHIPdAGoFJTTf4NR6ol8yxC-Lh",
-  displayName: "Ethereum Sepolia",
+  displayName: "Ethereum Goerli",
   blockExplorer: "https://goerli.etherscan.io",
   ticker: "ETH",
   tickerName: "Ethereum",
@@ -150,6 +150,42 @@ export default function Home() {
     console.log(balance);
   };
 
+  const getTokenBalance = async (token: string) => {
+    if (!provider) {
+      console.log("provider not initialized yet");
+      return;
+    }
+    const rpc = new RPC(provider);
+    const balance = await rpc.getTokenBalance(token);
+    console.log(balance);
+
+    // @ts-ignore
+    if (window.Telegram) {
+      // @ts-ignore
+      window.Telegram?.WebApp?.showAlert("Token address: " + token + "\nBalance: " + balance);
+    }
+  };
+
+  const approveLidoToCollateral = async () => {
+    if (!provider) {
+      console.log("provider not initialized yet");
+      return;
+    }
+    const rpc = new RPC(provider);
+    const receipt = await rpc.approveLidoToCollateral();
+    console.log(receipt);
+  };
+
+  const sendLidoToTenet = async () => {
+    if (!provider) {
+      console.log("provider not initialized yet");
+      return;
+    }
+    const rpc = new RPC(provider);
+    const receipt = await rpc.sendLidoToTenet();
+    console.log(receipt);
+  };
+
   const sendTransaction = async () => {
     if (!provider) {
       console.log("provider not initialized yet");
@@ -205,7 +241,12 @@ export default function Home() {
           </div>
           <div>
             <button onClick={getBalance} className="card">
-              Get Balance
+              Get ETH Balance
+            </button>
+          </div>
+          <div>
+            <button onClick={() => getTokenBalance('0x1643E812aE58766192Cf7D2Cf9567dF2C37e9B7F')} className="card">
+              Get stETH Balance
             </button>
           </div>
           <div>
@@ -216,6 +257,16 @@ export default function Home() {
           <div>
             <button onClick={sendTransaction} className="card">
               Send Transaction
+            </button>
+          </div>
+          <div>
+            <button onClick={approveLidoToCollateral} className="card">
+              Approve Lido to Hyperlane Collateral
+            </button>
+          </div>
+          <div>
+            <button onClick={sendLidoToTenet} className="card">
+              Send Lido to Tenet
             </button>
           </div>
           <div>
