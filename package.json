@@ -1,0 +1,13 @@
+{
+  "name": "ethparis-hack",
+  "version": "0.0.0",
+  "packageManager": "pnpm@8.6.9",
+  "scripts": {
+    "build": "turbo build",
+    "test": "turbo test",
+    "lint": "turbo lint"
+  },
+  "dependencies": {
+    "turbo": "^1.10.9"
+  }
+}
