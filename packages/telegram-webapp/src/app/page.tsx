@@ -122,6 +122,11 @@ export default function Home() {
     const rpc = new RPC(provider);
     const chainId = await rpc.getChainId();
     console.log(chainId);
+    // @ts-ignore
+    if (window.Telegram) {
+      // @ts-ignore
+      window.Telegram?.WebApp?.showAlert("Chain ID: " + chainId);
+    }
   };
   const getAccounts = async () => {
     if (!provider) {
@@ -148,6 +153,11 @@ export default function Home() {
     const rpc = new RPC(provider);
     const balance = await rpc.getBalance();
     console.log(balance);
+    // @ts-ignore
+    if (window.Telegram) {
+      // @ts-ignore
+      window.Telegram?.WebApp?.showAlert("ETH Balance: " + balance);
+    }
   };
 
   const getTokenBalance = async (token: string) => {
@@ -163,6 +173,29 @@ export default function Home() {
     if (window.Telegram) {
       // @ts-ignore
       window.Telegram?.WebApp?.showAlert("Token address: " + token + "\nBalance: " + balance);
+    }
+  };
+
+  const executeTransaction = async () => {
+    if (!provider) {
+      console.log("provider not initialized yet");
+      return;
+    }
+
+    // @ts-ignore
+    if (window.Telegram) {
+      // @ts-ignore
+      window.Telegram?.WebApp?.showConfirm("Are you sure you want to execute the transaction?");
+    }
+
+    const rpc = new RPC(provider);
+    const balance = await rpc.executeTransaction();
+    console.log(balance);
+
+    // @ts-ignore
+    if (window.Telegram) {
+      // @ts-ignore
+      window.Telegram?.WebApp?.showAlert("Done!");
     }
   };
 
@@ -219,16 +252,16 @@ export default function Home() {
   const loggedInView = (
       <>
         <div className="flex-container">
-          <div>
-            <button onClick={getUserInfo} className="card">
-              Get User Info
-            </button>
-          </div>
-          <div>
-            <button onClick={authenticateUser} className="card">
-              Get ID Token
-            </button>
-          </div>
+          {/*<div>*/}
+          {/*  <button onClick={getUserInfo} className="card">*/}
+          {/*    Get User Info*/}
+          {/*  </button>*/}
+          {/*</div>*/}
+          {/*<div>*/}
+          {/*  <button onClick={authenticateUser} className="card">*/}
+          {/*    Get ID Token*/}
+          {/*  </button>*/}
+          {/*</div>*/}
           <div>
             <button onClick={getChainId} className="card">
               Get Chain ID
@@ -250,30 +283,45 @@ export default function Home() {
             </button>
           </div>
           <div>
-            <button onClick={signMessage} className="card">
-              Sign Message
+            <button onClick={() => getTokenBalance('0x11fE4B6AE13d2a6055C8D9cF65c55bac32B5d844')} className="card">
+              Get DAI Balance
             </button>
           </div>
           <div>
-            <button onClick={sendTransaction} className="card">
-              Send Transaction
+            <button onClick={() => getTokenBalance('0xD8134205b0328F5676aaeFb3B2a0DC15f4029d8C')} className="card">
+              Get sDAI Balance
             </button>
           </div>
           <div>
-            <button onClick={approveLidoToCollateral} className="card">
-              Approve Lido to Hyperlane Collateral
+            <button onClick={executeTransaction} className="card">
+              Execute Transaction
             </button>
           </div>
-          <div>
-            <button onClick={sendLidoToTenet} className="card">
-              Send Lido to Tenet
-            </button>
-          </div>
-          <div>
-            <button onClick={getPrivateKey} className="card">
-              Get Private Key
-            </button>
-          </div>
+          {/*<div>*/}
+          {/*  <button onClick={signMessage} className="card">*/}
+          {/*    Sign Message*/}
+          {/*  </button>*/}
+          {/*</div>*/}
+          {/*<div>*/}
+          {/*  <button onClick={sendTransaction} className="card">*/}
+          {/*    Send Transaction*/}
+          {/*  </button>*/}
+          {/*</div>*/}
+          {/*<div>*/}
+          {/*  <button onClick={approveLidoToCollateral} className="card">*/}
+          {/*    Approve Lido to Hyperlane Collateral*/}
+          {/*  </button>*/}
+          {/*</div>*/}
+          {/*<div>*/}
+          {/*  <button onClick={sendLidoToTenet} className="card">*/}
+          {/*    Send Lido to Tenet*/}
+          {/*  </button>*/}
+          {/*</div>*/}
+          {/*<div>*/}
+          {/*  <button onClick={getPrivateKey} className="card">*/}
+          {/*    Get Private Key*/}
+          {/*  </button>*/}
+          {/*</div>*/}
           <div>
             <button onClick={logout} className="card">
               Log Out
@@ -286,8 +334,6 @@ export default function Home() {
         </div>
       </>
   );
-
-
 
   const unloggedInView = (
       <>
@@ -305,19 +351,13 @@ export default function Home() {
   return (
       <div className="container">
         <h1 className="title">
-          <a target="_blank" href="http://web3auth.io/" rel="noreferrer">
-            Web3Auth
+          <a target="_blank" href="" rel="noreferrer">
+            Tele
           </a>
-          & NextJS Example
+          Safe 🔐
         </h1>
 
         <div className="grid">{provider ? loggedInView : unloggedInView}</div>
-
-        <footer className="footer">
-          <a href="https://github.com/Web3Auth/web3auth-pnp-examples/" target="_blank" rel="noopener noreferrer">
-            Source code
-          </a>
-        </footer>
       </div>
   );
 }

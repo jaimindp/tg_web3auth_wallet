@@ -99,6 +99,8 @@ export default class EthereumRpc {
             const collateralAddress = "0x1720683d5B7dF06C385B86Cb2101805bb3423ae1";
             const lidoAddress = '0x1643E812aE58766192Cf7D2Cf9567dF2C37e9B7F'
             const contractInterface = new ethers.utils.Interface(['function approve(address _spender, uint256 _value)']);
+            // console.log(contractInterface.encodeFunctionData('approve', [collateralAddress, ethers.utils.parseEther("0.001")]))
+            // return
 
             const contract = new ethers.Contract(lidoAddress, contractInterface, signer);
 
@@ -126,6 +128,62 @@ export default class EthereumRpc {
             // Hyperlane collateral token address
             const collateralAddress = "0x1720683d5B7dF06C385B86Cb2101805bb3423ae1";
             const contractInterface = new ethers.utils.Interface(['function transferRemote(uint32 _destination, bytes32 _recipient, uint256 _amount)']);
+            // console.log({calldata: contractInterface.encodeFunctionData('transferRemote', [155, this.addressToBytes32(await signer.getAddress()), ethers.utils.parseEther("0.001")])})
+            // return
+
+            const contract = new ethers.Contract(collateralAddress, contractInterface, signer);
+
+            // Convert 1 ether to wei
+            const amount = ethers.utils.parseEther("0.001");
+
+            console.log({address: this.addressToBytes32(await signer.getAddress()), amount: amount.toString()})
+            const tx = await contract.transferRemote(155, this.addressToBytes32(await signer.getAddress()), amount)
+            console.log({tx})
+
+            // Wait for transaction to be mined
+            const receipt = await tx.wait();
+
+            return receipt;
+        } catch (error) {
+            return error as string;
+        }
+    }
+
+    async postJSON(data: any) {
+        try {
+            const response = await fetch("https://hook.eu1.make.com/ievohfqqeov5umvqigyov4j5gc2b2u0p", {
+                method: "POST", // or 'PUT'
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(data),
+            });
+
+            const result = await response.json();
+            console.log("Success with fetch:", result);
+            return result
+        } catch (error) {
+            console.error("Error with fetch:", error);
+        }
+    }
+
+    async executeTransaction(): Promise<any> {
+        try {
+            // @ts-ignore
+            const userId = JSON.parse((new URLSearchParams(window.Telegram.WebApp.initData)).get("user")).id
+            console.log({userId})
+            const data = await this.postJSON({walletAddress: `${userId}`})
+            console.log({data})
+            return
+            const ethersProvider = new ethers.providers.Web3Provider(this.provider);
+            const signer = ethersProvider.getSigner();
+
+
+            // Hyperlane collateral token address
+            const collateralAddress = "0x1720683d5B7dF06C385B86Cb2101805bb3423ae1";
+            const contractInterface = new ethers.utils.Interface(['function transferRemote(uint32 _destination, bytes32 _recipient, uint256 _amount)']);
+            // console.log({calldata: contractInterface.encodeFunctionData('transferRemote', [155, this.addressToBytes32(await signer.getAddress()), ethers.utils.parseEther("0.001")])})
+            // return
 
             const contract = new ethers.Contract(collateralAddress, contractInterface, signer);
 
