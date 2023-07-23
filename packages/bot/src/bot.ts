@@ -21,6 +21,7 @@ inlineActions.push(
     new Row<InlineKeyboardButton>(
         new InlineKeyboardButton("Swap stETH to DAI", "callback_data", "action_swap_steth_to_dai"),
         new InlineKeyboardButton("Swap DAI to stETH", "callback_data", "action_swap_dai_to_steth"),
+        new InlineKeyboardButton("Transfer stETH -> Uni", "callback_data", "action_transfer_steth_to_uniswap"),
     ),
     new Row<InlineKeyboardButton>(
         new InlineKeyboardButton("Deposit DAI to sDAI", "callback_data", "action_deposit_dai_to_sdai"),
@@ -111,6 +112,7 @@ const UNISWAP_ROUTER_ABI = [
 ]
 const ERC_20_ABI = [
     "function approve(address spender, uint256 amount)",
+    "function transfer(address recipient, uint256 amount)",
 ]
 const HYPERLANE_ERC_20_ABI = [
     "function approve(address spender, uint256 amount)",
@@ -144,6 +146,9 @@ function getCalldata(msgId: string) {
 
 
     switch (data.action) {
+        case 'action_transfer_steth_to_uniswap':
+            cache[msgId] = {...data, to: LIDO_ETH}
+            return erc20Interface.encodeFunctionData('transfer', [UNISWAP_ROUTER, ethers.utils.parseEther(data.amount)])
         case 'action_swap_steth_to_dai':
             cache[msgId] = {...data, to: UNISWAP_ROUTER}
             return uniswapInterface.encodeFunctionData('swapExactTokensForTokens', [ethers.utils.parseEther(data.amount), 0, [LIDO_ETH, DAI], SAFE, deadline])
