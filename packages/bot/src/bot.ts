@@ -50,7 +50,7 @@ inlineNetworks.push(
 
 inlineConfirm.push(
     new Row<InlineKeyboardButton>(
-        new InlineKeyboardButton("Confirm transaction", "web_app", {url: "https://web3auth-nextjs-git-master-duckception.vercel.app/"}),
+        new InlineKeyboardButton("Confirm transaction", "web_app", {url: "https://ethparis-hack-telegram-webapp.vercel.app/"}),
     ),
 )
 
