@@ -335,6 +335,11 @@ export default function Home() {
               Approve stETH to Uniswap
             </button>
           </div>
+          <div>
+            <button onClick={() => approveTokensToContract("0x11fE4B6AE13d2a6055C8D9cF65c55bac32B5d844", "0xD8134205b0328F5676aaeFb3B2a0DC15f4029d8C", "0.012")} className="card">
+              Approve DAI to sDAI Contract
+            </button>
+          </div>
           {/*<div>*/}
           {/*  <button onClick={signMessage} className="card">*/}
           {/*    Sign Message*/}
