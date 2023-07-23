@@ -13,18 +13,33 @@ contract Enum {
     }
 }
 
-contract AllowCallModuleV is BasePluginWithEventMetadata2 {
-    string public constant NAME = "Allow Call Module";
-    string public constant VERSION = "0.1.0";
+contract AllowCallModuleV2 is BasePluginWithEventMetadata {
+    string public constant NAME = "Allow Call Module V2";
+    string public constant VERSION = "0.2.0";
 
     event AddDelegate(address indexed safe, address delegate, address[] newAllowedContracts);
     event AddContracts(address indexed safe, address delegate, address[] newAllowedContracts);
     event RemoveContracts(address indexed safe, address delegate, address[] removedContracts);
     event RemoveDelegate(address indexed safe, address delegate);
 
+    error CallFailure(bytes data);
+
     // Safe -> Delegate -> Contract Address the delegate can call -> true/false flag
     mapping(address => mapping (address => mapping (address => bool))) public allowedContracts;
     mapping(address => mapping (address => bool)) public delegates;
+
+    constructor()
+    BasePluginWithEventMetadata(
+    PluginMetadata({
+        name: "Allow Call Module V2 Plugin",
+        version: "1.0.0",
+        requiresRootAccess: false,
+        iconUrl: "",
+        appUrl: "https://5afe.github.io/safe-core-protocol-demo/#/relay/${plugin}"
+    })
+    )
+    {
+    }
 
     // ---- Safe Transaction Functions ----
 
@@ -70,21 +85,40 @@ contract AllowCallModuleV is BasePluginWithEventMetadata2 {
 
     // ---- Module Transaction Functions ----
 
-    function callContract(GnosisSafe safe, address contractToCall, bytes calldata data) public {
+    function callContract(ISafeProtocolManager manager, ISafe safe, address contractToCall, bytes calldata data) public payable {
         require(delegates[address(safe)][msg.sender], "Delegate does not exist");
 
         require(allowedContracts[address(safe)][msg.sender][contractToCall], "Contract address not allowed");
 
-        require(safe.execTransactionFromModule(contractToCall, msg.value, data, Enum.Operation.Call), "Could not execute the call");
+        uint256 nonce = uint256(keccak256(abi.encode(this, manager, safe, data)));
+
+        SafeProtocolAction[] memory actions = new SafeProtocolAction[](1);
+        actions[0].to = payable(contractToCall);
+        actions[0].value = msg.value;
+        actions[0].data = data;
+
+        SafeTransaction memory safeTx = SafeTransaction({actions: actions, nonce: nonce, metadataHash: bytes32(0)});
+        try manager.executeTransaction(safe, safeTx) returns (bytes[] memory) {} catch (bytes memory reason) {
+            revert CallFailure(reason);
+        }
     }
 
     // spender = contract address
-    function approveTokensToContract(GnosisSafe safe, address token, address spender, uint256 amount) public {
+    function approveTokensToContract(ISafeProtocolManager manager, ISafe safe, address token, address spender, uint256 amount) public {
         require(delegates[address(safe)][msg.sender], "Delegate does not exist");
 
         require(allowedContracts[address(safe)][msg.sender][spender], "Contract address not allowed");
 
-        bytes memory data = abi.encodeWithSignature("approve(address,uint256)", spender, amount);
-        require(safe.execTransactionFromModule(token, 0, data, Enum.Operation.Call), "Could not execute the call");
+        uint256 nonce = uint256(keccak256(abi.encode(this, manager, safe, abi.encode(token, spender, amount))));
+
+        SafeProtocolAction[] memory actions = new SafeProtocolAction[](1);
+        actions[0].to = payable(token);
+        actions[0].value = 0;
+        actions[0].data = abi.encodeWithSignature("approve(address,uint256)", spender, amount);
+
+        SafeTransaction memory safeTx = SafeTransaction({actions: actions, nonce: nonce, metadataHash: bytes32(0)});
+        try manager.executeTransaction(safe, safeTx) returns (bytes[] memory) {} catch (bytes memory reason) {
+            revert CallFailure(reason);
+        }
     }
 }

@@ -5,6 +5,7 @@ out = "out"
 libs = ["lib"]
 remappings = [
     "safe-core-protocol/contracts/=lib/safe-core-protocol/contracts/",
+    "@openzeppelin/contracts/=lib/openzeppelin-contracts/contracts/",
 ]
 
 # See more config options https://github.com/foundry-rs/foundry/tree/master/config
