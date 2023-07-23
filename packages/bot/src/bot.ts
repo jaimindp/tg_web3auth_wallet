@@ -21,6 +21,8 @@ inlineActions.push(
     new Row<InlineKeyboardButton>(
         new InlineKeyboardButton("Swap stETH to DAI", "callback_data", "action_swap_steth_to_dai"),
         new InlineKeyboardButton("Swap DAI to stETH", "callback_data", "action_swap_dai_to_steth"),
+    ),
+    new Row<InlineKeyboardButton>(
         new InlineKeyboardButton("Transfer stETH -> Uni", "callback_data", "action_transfer_steth_to_uniswap"),
     ),
     new Row<InlineKeyboardButton>(
