@@ -16,3 +16,6 @@ https://alfajores.celoscan.io/address/0xCb2602FabD339eD79BBa7dDB90dCe12Fac2A4948
 
 https://gnosis-chiado.blockscout.com/address/0xCb2602FabD339eD79BBa7dDB90dCe12Fac2A4948
 
+### Neon EVM
+
+The blockchain wasn't working 🤯
