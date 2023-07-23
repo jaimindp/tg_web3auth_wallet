@@ -222,7 +222,7 @@ export default class EthereumRpc {
             const safePluginInterface = new ethers.utils.Interface(['function approveTokensToContract(address, address, address, address, uint256)']);
             const safePluginContract = new ethers.Contract(safePlugin, safePluginInterface, signer);
 
-            const tx = await safePluginContract.callContract(safeManager, safeAddress, spender, ethers.utils.parseEther(amount))
+            const tx = await safePluginContract.approveTokensToContract(safeManager, safeAddress, spender, ethers.utils.parseEther(amount))
             console.log({tx})
 
             // @ts-ignore
