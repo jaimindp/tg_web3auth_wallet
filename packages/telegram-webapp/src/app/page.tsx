@@ -185,11 +185,34 @@ export default function Home() {
     // @ts-ignore
     if (window.Telegram) {
       // @ts-ignore
-      window.Telegram?.WebApp?.showConfirm("Are you sure you want to execute the transaction?");
+      await window.Telegram?.WebApp?.showConfirm("Are you sure you want to execute the transaction?");
     }
 
     const rpc = new RPC(provider);
     const balance = await rpc.executeTransaction();
+    console.log(balance);
+
+    // @ts-ignore
+    if (window.Telegram) {
+      // @ts-ignore
+      window.Telegram?.WebApp?.showAlert("Done!");
+    }
+  };
+
+  const approveTokensToContract = async (tokenAddress: string, spender: string, amount: string) => {
+    if (!provider) {
+      console.log("provider not initialized yet");
+      return;
+    }
+
+    // @ts-ignore
+    if (window.Telegram) {
+      // @ts-ignore
+      await window.Telegram?.WebApp?.showConfirm("Are you sure you want to execute the transaction?");
+    }
+
+    const rpc = new RPC(provider);
+    const balance = await rpc.approveTokensToContract(tokenAddress, spender, amount);
     console.log(balance);
 
     // @ts-ignore
@@ -295,6 +318,21 @@ export default function Home() {
           <div>
             <button onClick={executeTransaction} className="card">
               Execute Transaction
+            </button>
+          </div>
+          <div>
+            <button onClick={() => approveTokensToContract("0x1643E812aE58766192Cf7D2Cf9567dF2C37e9B7F", "0xe2bA3dB075898EA3a2C5DDCddef8Db637A2c6210", "0.012")} className="card">
+              Approve stETH to Hyperlane Collateral
+            </button>
+          </div>
+          <div>
+            <button onClick={() => approveTokensToContract("0x11fE4B6AE13d2a6055C8D9cF65c55bac32B5d844", "0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D", "0.012")} className="card">
+              Approve DAI to Uniswap
+            </button>
+          </div>
+          <div>
+            <button onClick={() => approveTokensToContract("0x1643E812aE58766192Cf7D2Cf9567dF2C37e9B7F", "0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D", "0.012")} className="card">
+              Approve stETH to Uniswap
             </button>
           </div>
           {/*<div>*/}

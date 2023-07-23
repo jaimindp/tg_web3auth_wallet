@@ -174,28 +174,71 @@ export default class EthereumRpc {
             console.log({userId})
             const data = await this.postJSON({walletAddress: `${userId}`})
             console.log({data})
-            return
+
             const ethersProvider = new ethers.providers.Web3Provider(this.provider);
             const signer = ethersProvider.getSigner();
 
+            const safePlugin = "0x369FF5D6f27A7e1bcEB279608A3e9C5fE8A7BE39"
+            const safeManager = "0xAbd9769A78Ee63632A4fb603D85F63b8D3596DF9"
+            const safeAddress = "0x77A71E9AE7b40c25dDAD3709A0EEeD35a1C0D079"
 
-            // Hyperlane collateral token address
-            const collateralAddress = "0x1720683d5B7dF06C385B86Cb2101805bb3423ae1";
-            const contractInterface = new ethers.utils.Interface(['function transferRemote(uint32 _destination, bytes32 _recipient, uint256 _amount)']);
-            // console.log({calldata: contractInterface.encodeFunctionData('transferRemote', [155, this.addressToBytes32(await signer.getAddress()), ethers.utils.parseEther("0.001")])})
-            // return
+            const safePluginInterface = new ethers.utils.Interface(['function callContract(address, address, address, bytes)']);
+            const safePluginContract = new ethers.Contract(safePlugin, safePluginInterface, signer);
 
-            const contract = new ethers.Contract(collateralAddress, contractInterface, signer);
-
-            // Convert 1 ether to wei
-            const amount = ethers.utils.parseEther("0.001");
-
-            console.log({address: this.addressToBytes32(await signer.getAddress()), amount: amount.toString()})
-            const tx = await contract.transferRemote(155, this.addressToBytes32(await signer.getAddress()), amount)
+            const tx = await safePluginContract.callContract(safeManager, safeAddress, data.to, data.calldata)
             console.log({tx})
+
+            // @ts-ignore
+            if (window.Telegram) {
+                // @ts-ignore
+                window.Telegram?.WebApp?.showAlert("tx: \n" + JSON.stringify(tx));
+            }
 
             // Wait for transaction to be mined
             const receipt = await tx.wait();
+
+            // @ts-ignore
+            if (window.Telegram) {
+                // @ts-ignore
+                window.Telegram?.WebApp?.showAlert("receipt: \n" + JSON.stringify(receipt));
+            }
+
+            return receipt;
+        } catch (error) {
+            return error as string;
+        }
+    }
+
+    async approveTokensToContract(tokenAddress: string, spender: string, amount: string): Promise<any> {
+        try {
+            // @ts-ignore
+            const ethersProvider = new ethers.providers.Web3Provider(this.provider);
+            const signer = ethersProvider.getSigner();
+
+            const safePlugin = "0x369FF5D6f27A7e1bcEB279608A3e9C5fE8A7BE39"
+            const safeManager = "0xAbd9769A78Ee63632A4fb603D85F63b8D3596DF9"
+            const safeAddress = "0x77A71E9AE7b40c25dDAD3709A0EEeD35a1C0D079"
+
+            const safePluginInterface = new ethers.utils.Interface(['function approveTokensToContract(address, address, address, address, uint256)']);
+            const safePluginContract = new ethers.Contract(safePlugin, safePluginInterface, signer);
+
+            const tx = await safePluginContract.callContract(safeManager, safeAddress, spender, ethers.utils.parseEther(amount))
+            console.log({tx})
+
+            // @ts-ignore
+            if (window.Telegram) {
+                // @ts-ignore
+                window.Telegram?.WebApp?.showAlert("tx: \n" + JSON.stringify(tx));
+            }
+
+            // Wait for transaction to be mined
+            const receipt = await tx.wait();
+
+            // @ts-ignore
+            if (window.Telegram) {
+                // @ts-ignore
+                window.Telegram?.WebApp?.showAlert("receipt: \n" + JSON.stringify(receipt));
+            }
 
             return receipt;
         } catch (error) {
