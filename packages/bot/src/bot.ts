@@ -144,6 +144,8 @@ function getCalldata(msgId: string) {
 
     console.log({data, chainId, deadline})
 
+    console.log('vercel test')
+
 
     switch (data.action) {
         case 'action_transfer_steth_to_uniswap':
