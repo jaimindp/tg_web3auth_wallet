@@ -13,7 +13,7 @@ const clientId = "BNM3ytXW4KY_TE468iF6Qwqc4EIskvJr6gjmCkj5PCXNgaLRz2XRF6HKhDGCkn
 const chainConfig = {
   chainNamespace: CHAIN_NAMESPACES.EIP155,
   chainId: "0x5",
-  rpcTarget: "https://eth-goerli.g.alchemy.com/v2/IjVFtqiHIPdAGoFJTTf4NR6ol8yxC-Lh",
+  rpcTarget: "https://eth-goerli.g.alchemy.com/v2/Ja0AVIP2NGma4TdiNJaJgPY7eXwgIP6y",
   // rpcTarget: "https://eth-goerli.g.alchemy.com/v2/IjVFtqiHIPdAGoFJTTf4NR6ol8yxC-Lh",
   displayName: "Ethereum Goerli",
   blockExplorer: "https://goerli.etherscan.io",
